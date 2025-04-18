@@ -23,9 +23,7 @@ class Chaser:
     def is_walkable(self, x, y):
         rows = len(self.maze)
         cols = len(self.maze[0])
-        return (
-            0 <= x < cols and 0 <= y < rows and self.maze[y][x] == 0
-        )  # 0 — проходимая клетка
+        return 0 <= x < cols and 0 <= y < rows and self.maze[y][x] == 0
 
     def get_neighbors(self, node):
         x, y = node

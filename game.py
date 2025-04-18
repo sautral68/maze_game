@@ -11,11 +11,10 @@ import random
 
 class MazeGame:
     def __init__(self, root):
+        # creating maze and root
         self.root = root
-
         self.maze, self.exit_pos = generate_maze()
         self.rows, self.cols = config.MAZE_ROWS, config.MAZE_COLS
-
         self.canvas = tk.Canvas(
             root,
             width=self.cols * config.CELL_SIZE,
@@ -24,9 +23,8 @@ class MazeGame:
         )
         self.canvas.pack()
 
+        # spawn player and chaser
         self.player = Player(self.canvas, self.maze)
-
-        # Спавн преследователя в случайной проходимой клетке
         chaser_y, chaser_x = self.get_random_passable_cell(min_distance=7)
         self.chaser = Chaser(
             self.canvas,
@@ -35,18 +33,23 @@ class MazeGame:
             start_y=chaser_y,
         )
 
+        # chaser move delay
         self.chaser_move_delay = 90
         self.chaser_last_move_time = 0
 
+        # spawn exit zone
         self.exit_zone = ExitZone(self.canvas, self.maze)
 
+        # starting timer
         self.timer = Timer(root)
         self.timer.start()
 
+        # binding arrow keys to move
         self.root.bind("<Key>", self.handle_key_press)
 
         self.game_loop()
 
+    # function to spawn the chaser in random cell
     def get_random_passable_cell(self, min_distance=0):
         while True:
             x = random.randint(1, self.rows - 2)
@@ -58,9 +61,11 @@ class MazeGame:
                         continue
                 return (x, y)
 
+    # moving function
     def handle_key_press(self, event):
         self.player.move(event)
 
+    # checking if player win
     def check_win(self):
         if self.exit_zone.is_player_at_exit(self.player.x, self.player.y):
             self.timer.stop()
@@ -69,12 +74,14 @@ class MazeGame:
             )
             self.root.quit()
 
+    # checking if player loose
     def check_loss(self):
         if (self.player.x, self.player.y) == (self.chaser.x, self.chaser.y):
             self.timer.stop()
             messagebox.showinfo("You Loose!", "Chaser reached you!")
             self.root.quit()
 
+    # checking if time out
     def game_loop(self):
         current_time = self.timer.get_time() * 1000
 
