@@ -12,3 +12,6 @@ EXIT_COLOR = "red"
 CHASER_COLOR = "purple"
 WALL_COLOR = "black"
 BACKGROUND_COLOR = "white"
+
+# Chasers count
+CHASER_COUNT = 3

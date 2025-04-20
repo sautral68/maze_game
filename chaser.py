@@ -1,13 +1,17 @@
 import heapq
+import random
 import config
 
 
 class Chaser:
-    def __init__(self, canvas, maze, start_x, start_y):
+    def __init__(self, canvas, maze, start_x, start_y, move_delay=50):
         self.canvas = canvas
         self.maze = maze
         self.x = start_x
         self.y = start_y
+        self.move_delay = move_delay  # delay between steps
+        # used in the game loop to control the frequency of movement
+        self.last_move_time = 0
         self.cell_size = config.CELL_SIZE
         self.rect = self.canvas.create_rectangle(
             self.x * self.cell_size,
@@ -65,11 +69,13 @@ class Chaser:
         return []
 
     def move_towards(self, player_x, player_y):
-        path = self.a_star((self.x, self.y), (player_x, player_y))
-        if path:
-            next_x, next_y = path[0]
-            dx = (next_x - self.x) * self.cell_size
-            dy = (next_y - self.y) * self.cell_size
-            self.canvas.move(self.rect, dx, dy)
-            self.x = next_x
-            self.y = next_y
+        # 70% chance that the chaser will think and take a step, and 30% that he will "slow down" and miss (you can chage the value if you want)
+        if random.random() < 0.7:
+            path = self.a_star((self.x, self.y), (player_x, player_y))
+            if path:
+                next_x, next_y = path[0]
+                dx = (next_x - self.x) * self.cell_size
+                dy = (next_y - self.y) * self.cell_size
+                self.canvas.move(self.rect, dx, dy)
+                self.x = next_x
+                self.y = next_y

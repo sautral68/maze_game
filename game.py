@@ -25,17 +25,12 @@ class MazeGame:
 
         # spawn player and chaser
         self.player = Player(self.canvas, self.maze)
-        chaser_y, chaser_x = self.get_random_passable_cell(min_distance=7)
-        self.chaser = Chaser(
-            self.canvas,
-            self.maze,
-            start_x=chaser_x,
-            start_y=chaser_y,
-        )
-
-        # chaser move delay
-        self.chaser_move_delay = 90
-        self.chaser_last_move_time = 0
+        self.chasers = []  # array for storing a given number of chasers
+        # creating chasers
+        for _ in range(config.CHASER_COUNT):
+            chaser_y, chaser_x = self.get_random_passable_cell(min_distance=5)
+            chaser = Chaser(self.canvas, self.maze, chaser_x, chaser_y, move_delay=50)
+            self.chasers.append(chaser)
 
         # spawn exit zone
         self.exit_zone = ExitZone(self.canvas, self.maze)
@@ -76,10 +71,11 @@ class MazeGame:
 
     # checking if player loose
     def check_loss(self):
-        if (self.player.x, self.player.y) == (self.chaser.x, self.chaser.y):
-            self.timer.stop()
-            messagebox.showinfo("You Loose!", "Chaser reached you!")
-            self.root.quit()
+        for chaser in self.chasers:
+            if (self.player.x, self.player.y) == (chaser.x, chaser.y):
+                self.timer.stop()
+                messagebox.showinfo("You Lose!", "Chaser reached you!")
+                self.root.quit()
 
     # checking if time out
     def game_loop(self):
@@ -93,8 +89,10 @@ class MazeGame:
             messagebox.showinfo("You Loose!", "Time is out!")
             self.root.quit()
 
-        if current_time - self.chaser_last_move_time >= self.chaser_move_delay:
-            self.chaser.move_towards(self.player.x, self.player.y)
-            self.chaser_last_move_time = current_time
+        # the movement of chasers
+        for chaser in self.chasers:
+            if current_time - chaser.last_move_time >= chaser.move_delay:
+                chaser.move_towards(self.player.x, self.player.y)
+                chaser.last_move_time = current_time
 
         self.root.after(100, self.game_loop)
